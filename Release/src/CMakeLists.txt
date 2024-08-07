@@ -37,6 +37,8 @@ set(SOURCES
   utilities/asyncrt_utils.cpp
   utilities/base64.cpp
   utilities/web_utilities.cpp
+  xml/xml_parsing.cpp
+  xml/xml.cpp
 )
 
 add_library(cpprest ${SOURCES})

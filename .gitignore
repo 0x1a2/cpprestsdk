@@ -75,3 +75,5 @@ Generated Files/
 Build_iOS/Apple-Boost-BuildScript
 
 /out/
+/build/
+.idea
