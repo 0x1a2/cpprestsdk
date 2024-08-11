@@ -11,3 +11,8 @@ web::xml::value::value() : m_value(std::move(nullptr)) {
 web::xml::value::value(utility::string_t value) : m_value(std::move(value)) {
 
 }
+
+utility::string_t web::xml::value::to_string() const
+{
+    return m_value;
+}

@@ -41,6 +41,7 @@ public:
     _ASYNCRTIMP value& operator=(value&&) CPPREST_NOEXCEPT;
 
     _ASYNCRTIMP static value __cdecl parse(const utility::string_t& value);
+    _ASYNCRTIMP utility::string_t to_string() const;
 
 private:
     utility::string_t m_value;
