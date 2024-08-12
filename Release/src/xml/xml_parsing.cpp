@@ -70,7 +70,7 @@ web::xml::value web::xml::details::XML_StringParser<CharType>::parse()
 
     rapidxml::xml_document<> doc;
     doc.parse<0>(buffer);
-    //ToDo: Bug for some reason there is an issue with the first element of the xml which is not expected in the following processing steps.
+
     convertXmlToJson(&doc, json, json.GetAllocator());
     std::basic_string<CharType> jsonString = this->convertJsonToString(json);
 
@@ -107,8 +107,7 @@ void web::xml::details::XML_StringParser<CharType>::convertXmlToJson(rapidxml::x
         if (child->first_node()) {
             convertXmlToJson(child, json_child, allocator);
         } else {
-            //json_child.SetString(child->name(), allocator);
-            //json.AddMember(rapidjson::Value(child->name(), allocator).Move(), json_child, allocator);
+            
         }
 
         rapidjson::Value name;
