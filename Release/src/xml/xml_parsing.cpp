@@ -38,7 +38,7 @@ template<typename CharType>
 class XML_StringParser : public XML_Parser<CharType>
 {
 public:
-    XML_StringParser(const std::basic_string<CharType>& string) : m_startpos(&string[0]), m_BufferSize(string.size() + 1)
+    XML_StringParser(const std::basic_string<CharType>& string, bool skipFirstNode) : m_startpos(&string[0]), m_BufferSize(string.size() + 1), m_skipFirstNode(skipFirstNode)
     {
         this->m_endpos = this->m_startpos + string.size();
     }
@@ -48,6 +48,7 @@ private:
     const CharType* m_startpos;
     const CharType* m_endpos;
     const size_t m_BufferSize;
+    const bool m_skipFirstNode;
 
     void convertXmlToJson(rapidxml::xml_node<> *node, rapidjson::Value &json, rapidjson::Document::AllocatorType& allocator);
 
@@ -65,6 +66,8 @@ web::xml::value web::xml::details::XML_StringParser<CharType>::parse()
     CharType* buffer = new char[this->m_BufferSize];
     std::memcpy(buffer, this->m_startpos, this->m_BufferSize);
 
+    buffer[m_BufferSize] = '\0';
+
     rapidjson::Document json;
     json.SetObject();
 
@@ -76,19 +79,34 @@ web::xml::value web::xml::details::XML_StringParser<CharType>::parse()
 
     delete[] buffer;
 
+    if (this->m_skipFirstNode){
+        size_t pos = jsonString.find("{");
+        if(pos == std::string::npos)
+            throw std::exception(); // ToDo proper error Handling
+        else{
+            pos = jsonString.find("{", pos + 1);
+            if(pos == std::string::npos)
+                throw std::exception(); // ToDo proper error Handling
+            else{
+                jsonString = jsonString.substr(pos);
+                jsonString = jsonString.substr(0, jsonString.length() - 1);
+            }
+        }
+    }
+
     return web::xml::value(jsonString);
 }
 
 template<typename CharType>
-static web::xml::value _parse_string(const std::basic_string<CharType>& str)
+static web::xml::value _parse_string(const std::basic_string<CharType>& str, bool skipFirstNode)
 {
-    web::xml::details::XML_StringParser<CharType>parser(str);
+    web::xml::details::XML_StringParser<CharType>parser(str, skipFirstNode);
     web::xml::value value = parser.parse();
 
     return value;
 }
 
-web::xml::value web::xml::value::parse(const utility::string_t& str) { return _parse_string(str); }
+web::xml::value web::xml::value::parse(const utility::string_t& str, bool skipFirstNode) { return _parse_string(str, skipFirstNode); }
 
 template<typename CharType>
 void web::xml::details::XML_StringParser<CharType>::convertXmlToJson(rapidxml::xml_node<> *node, rapidjson::Value &json, rapidjson::Document::AllocatorType& allocator) {
@@ -107,7 +125,7 @@ void web::xml::details::XML_StringParser<CharType>::convertXmlToJson(rapidxml::x
         if (child->first_node()) {
             convertXmlToJson(child, json_child, allocator);
         } else {
-            
+
         }
 
         rapidjson::Value name;
@@ -129,8 +147,8 @@ void web::xml::details::XML_StringParser<CharType>::convertXmlToJson(rapidxml::x
             json.AddMember(name, json_child, allocator);
         }
 
-        if(json_child.IsObject())
-            json.AddMember(rapidjson::Value(child->name(), allocator).Move(), json_child, allocator);
+        //if(json_child.IsObject())
+            //json.AddMember(rapidjson::Value(child->name(), allocator).Move(), json_child, allocator);
     }
 }
 

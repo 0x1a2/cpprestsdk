@@ -40,7 +40,7 @@ public:
     _ASYNCRTIMP value& operator=(const value&);
     _ASYNCRTIMP value& operator=(value&&) CPPREST_NOEXCEPT;
 
-    _ASYNCRTIMP static value __cdecl parse(const utility::string_t& value);
+    _ASYNCRTIMP static value __cdecl parse(const utility::string_t& value, bool skipFirstNode = false);
     _ASYNCRTIMP utility::string_t to_string() const;
 
 private:
